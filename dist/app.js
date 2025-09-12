@@ -12,18 +12,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-require("dotenv/config");
 const ws_1 = require("ws");
 const cluster_1 = __importDefault(require("cluster"));
 const http_1 = __importDefault(require("http"));
-// import dotenv from "dotenv";
+const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-// import { sendError } from "./utils";
+const utils_js_1 = require("./utils.js");
 // import os from "os";
 const StreamManager_1 = require("./StreamManager");
-// dotenv.config();
+dotenv_1.default.config();
 const cors = 1; // os.cpus().length  // for vertical scaling
-console.log("Redis URL:", process.env.REDIS_URL);
 if (cluster_1.default.isPrimary) {
     for (let i = 0; i < cors; i++) {
         cluster_1.default.fork();
@@ -64,7 +62,7 @@ function handleJoinRoom(ws, data) {
         jsonwebtoken_1.default.verify(data.token, process.env.NEXTAUTH_SECRET, (err, decoded) => {
             if (err) {
                 console.error(err);
-                // sendError(ws, "Token verification failed");
+                (0, utils_js_1.sendError)(ws, "Token verification failed");
             }
             else {
                 StreamManager_1.RoomManager.getInstance().joinRoom(data.spaceId, decoded.creatorId, decoded.userId, ws, data.token);
@@ -109,7 +107,7 @@ function handleUserAction(ws, type, data) {
             yield processUserAction(type, data);
         }
         else {
-            // sendError(ws, "You are unauthorized to perform this action");
+            (0, utils_js_1.sendError)(ws, "You are unauthorized to perform this action");
         }
     });
 }

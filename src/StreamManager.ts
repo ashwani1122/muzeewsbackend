@@ -547,7 +547,7 @@ const connection = {
             data: { streamId, vote, votedBy: userId },
         })
         );
-    }
+    }    
 
     async castVote(
         userId: string,

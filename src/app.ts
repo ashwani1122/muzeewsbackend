@@ -1,18 +1,15 @@
-import "dotenv/config"; 
-
 import { WebSocket, WebSocketServer } from "ws";
 import cluster from "cluster";
 import http from "http";
-// import dotenv from "dotenv";
+import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
-// import { sendError } from "./utils";
+import { sendError } from "./utils.js";
 // import os from "os";
 
 import { RoomManager } from "./StreamManager";
 
-// dotenv.config();
+dotenv.config();
 const cors = 1; // os.cpus().length  // for vertical scaling
-console.log("Redis URL:", process.env.REDIS_URL);
 
 if (cluster.isPrimary) {
   for (let i = 0; i < cors; i++) {
@@ -69,7 +66,7 @@ async function handleJoinRoom(ws: WebSocket, data: Data) {
     (err: any, decoded: any) => {
       if (err) {
         console.error(err);
-        // sendError(ws, "Token verification failed");
+        sendError(ws, "Token verification failed");
       } else {
         RoomManager.getInstance().joinRoom(
           data.spaceId,
@@ -145,7 +142,7 @@ async function handleUserAction(ws: WebSocket, type: string, data: Data) {
     data.userId = user.userId;
     await processUserAction(type, data);
   } else {
-    // sendError(ws, "You are unauthorized to perform this action");
+    sendError(ws, "You are unauthorized to perform this action");
   }
 }
 
